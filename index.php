@@ -215,7 +215,7 @@
                 <div id="message" class="message"></div>
             </form>
             <p class="privacy-note">
-                🔒 <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank">Open source</a> - no data collected
+                🔒 <a href="https://github.com/snarpeppo/QRCV" target="_blank">Open source</a> - no data collected
             </p>
         </div>
     </div>
