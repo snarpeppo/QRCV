@@ -26,7 +26,6 @@ $headers = 'From: noreply@' . $_SERVER['HTTP_HOST'] . "\r\n";
 
 $mailSent = @mail($yourEmail, $subject, $message, $headers);
 
-$cvFile = $cvFile;
 if (file_exists($cvFile)) {
     $requesterSubject = 'Here is my CV - ' . $yourName;
     $requesterMessage = "Hi,\n\nThank you for your interest! Please find my CV attached.\n\nBest regards,\n" . $yourName;
