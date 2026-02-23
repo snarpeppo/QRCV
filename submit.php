@@ -32,8 +32,6 @@ if (file_exists($cvFile)) {
     $requesterMessage = "Hi,\n\nThank you for your interest! Please find my CV attached.\n\nBest regards,\n" . $yourName;
     $requesterHeaders = 'From: noreply@' . $_SERVER['HTTP_HOST'] . "\r\n";
     
-    // Attachment code - commented out for now
-    
     $boundary = md5(uniqid(time()));
     $requesterHeaders = "From: noreply@" . $_SERVER['HTTP_HOST'] . "\r\n";
     $requesterHeaders .= "MIME-Version: 1.0\r\n";
