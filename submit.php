@@ -6,7 +6,7 @@ require_once 'config.php';
 
 $yourEmail = $config['email'];
 $yourName = $config['name'];
-$emailsFile = 'emails.txt';
+$cvFile = $config['cv_path'];
 
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 
@@ -26,7 +26,7 @@ $headers = 'From: noreply@' . $_SERVER['HTTP_HOST'] . "\r\n";
 
 $mailSent = @mail($yourEmail, $subject, $message, $headers);
 
-$cvFile = 'CV/cv.pdf';
+$cvFile = $cvFile;
 if (file_exists($cvFile)) {
     $requesterSubject = 'Here is my CV - ' . $yourName;
     $requesterMessage = "Hi,\n\nThank you for your interest! Please find my CV attached.\n\nBest regards,\n" . $yourName;
