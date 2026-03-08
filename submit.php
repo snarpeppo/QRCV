@@ -17,39 +17,33 @@ function getClientIp() {
     return 'unknown';
 }
 
-function checkRateLimit($ip, $maxRequests = 5, $windowSeconds = 60) {
-    $rateFile = sys_get_temp_dir() . '/qrcv_ratelimit_' . md5($ip);
+function checkRateLimit($ip, $maxRequests = 1, $windowSeconds = 60) {
     $now = time();
+    $key = 'rate_' . md5($ip);
     
-    if (file_exists($rateFile)) {
-        $data = json_decode(file_get_contents($rateFile), true);
-        if ($data && $data['expires'] > $now) {
-            if ($data['count'] >= $maxRequests) {
-                return false;
-            }
-            $data['count']++;
-        } else {
-            $data = ['count' => 1, 'expires' => $now + $windowSeconds];
-        }
-    } else {
-        $data = ['count' => 1, 'expires' => $now + $windowSeconds];
+    if (!isset($_SESSION[$key])) {
+        $_SESSION[$key] = ['count' => 1, 'expires' => $now + $windowSeconds];
+        return ['success' => true, 'count' => 1, 'expires' => $now + $windowSeconds];
     }
     
-    file_put_contents($rateFile, json_encode($data));
-    return true;
+    $data = $_SESSION[$key];
+    
+    if ($data['expires'] > $now) {
+        if ($data['count'] >= $maxRequests) {
+            return ['success' => false, 'count' => $data['count'], 'expires' => $data['expires']];
+        }
+        $_SESSION[$key]['count'] = $data['count'] + 1;
+        return ['success' => true, 'count' => $data['count'] + 1, 'expires' => $data['expires']];
+    }
+    
+    $_SESSION[$key] = ['count' => 1, 'expires' => $now + $windowSeconds];
+    return ['success' => true, 'count' => 1, 'expires' => $now + $windowSeconds];
 }
 
 function sanitizeString($str, $maxLength = 100) {
     $str = trim($str);
     $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     return substr($str, 0, $maxLength);
-}
-
-$clientIp = getClientIp();
-
-if (!checkRateLimit($clientIp)) {
-    echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
-    exit;
 }
 
 $csrfToken = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
@@ -62,6 +56,29 @@ if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $cs
     ]]);
     exit;
 }
+
+$clientIp = getClientIp();
+
+// $debug = [
+//     'ip' => $clientIp,
+//     'ip_hash' => md5($clientIp),
+//     'rate_file' => sys_get_temp_dir() . '/qrcv_ratelimit_' . md5($clientIp),
+//     'server_vars' => [
+//         'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? 'not set',
+//         'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? 'not set',
+//         'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? 'not set'
+//     ]
+// ];
+
+$rateLimitResult = checkRateLimit($clientIp);
+// $debug['rate_check'] = $rateLimitResult;
+
+if (!$rateLimitResult['success']) {
+    echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
+    exit;
+}
+
+// $debug['continue'] = 'processing request';
 
 $yourEmail = filter_var($config['email'], FILTER_SANITIZE_EMAIL);
 $yourName = sanitizeString($config['name']);
@@ -114,16 +131,8 @@ if (file_exists($cvFile)) {
     $requesterSent = false;
 }
 
-// echo json_encode([
-//     'success' => true,
-//     'message' => 'Email sent successfully',
-//     'debug' => [
-//         'file_written' => $fileWritten ?? false,
-//         'mail_sent' => $mailSent,
-//         'requester_sent' => $requesterSent,
-//         'cv_file_exists' => file_exists($cvFile),
-//         'cv_file_path' => $cvFile,
-//         'requester_error' => $requesterSent ? null : error_get_last(),
-//         'server' => $_SERVER['HTTP_HOST']
-//     ]
-// ]);
+echo json_encode([
+    'success' => true,
+    'message' => 'Email sent successfully',
+    // 'debug' => $debug
+]);

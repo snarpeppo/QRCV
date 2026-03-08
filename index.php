@@ -271,10 +271,12 @@ if (empty($_SESSION['csrf_token'])) {
             try {
                 const response = await fetch('submit.php', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'email=' + encodeURIComponent(email) + '&csrf_token=' + encodeURIComponent(csrfToken)
                 });
                 
+                console.log('Response status:', response.status);
                 const result = await response.json();
                 console.log('Debug info:', result);
                 
@@ -283,10 +285,11 @@ if (empty($_SESSION['csrf_token'])) {
                     messageEl.className = 'message success';
                     document.getElementById('email').value = '';
                 } else {
-                    messageEl.textContent = 'Error: ' + result.message;
+                    messageEl.textContent = result.message;
                     messageEl.className = 'message error';
                 }
             } catch (err) {
+                console.log('Fetch error:', err);
                 messageEl.textContent = 'Something went wrong. Please try again.';
                 messageEl.className = 'message error';
             }
