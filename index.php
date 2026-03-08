@@ -11,6 +11,15 @@ if (empty($_SESSION['csrf_token'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fullstack Developer - CV</title>
     <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --text: #4a5568;
+            --text-dark: #2d3748;
+            --light: #e2e8f0;
+            --success: #16a34a;
+            --error: #dc2626;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -18,160 +27,169 @@ if (empty($_SESSION['csrf_token'])) {
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
         .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 500px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 48px 40px;
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         h1 {
-            color: #1a1a2e;
-            font-size: 28px;
-            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
         .title {
-            color: #4a5568;
-            font-size: 16px;
-            margin-bottom: 24px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 32px;
         }
         .bio {
-            color: #2d3748;
-            line-height: 1.6;
-            margin-bottom: 24px;
+            color: var(--text-dark);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
         }
-        .section-title {
-            color: #1a1a2e;
-            font-size: 14px;
+        .skills-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid var(--light);
+        }
+        .skills-title {
+            color: var(--primary);
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+        .skills-category {
+            margin-bottom: 16px;
+        }
+        .category-title {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
         .skills {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 20px;
-        }
-        .skills-category {
-            margin-bottom: 20px;
-        }
-        .category-title {
-            color: #4a5568;
-            font-size: 13px;
-            font-weight: 600;
             margin-bottom: 8px;
         }
         .skill-tag {
-            background: #e2e8f0;
-            color: #4a5568;
+            background: #f7fafc;
+            color: var(--text);
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 6px;
             font-size: 13px;
+            border: 1px solid var(--light);
+            transition: all 0.2s ease;
+        }
+        .skill-tag:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
         .form-section {
-            border-top: 1px solid #e2e8f0;
-            padding-top: 24px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--light);
         }
         .form-title {
-            color: #1a1a2e;
+            color: var(--primary);
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .form-desc {
-            color: #718096;
+            color: var(--text);
             font-size: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .form-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         input[type="email"] {
             flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
+            padding: 14px 16px;
+            border: 1px solid var(--light);
             border-radius: 8px;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         input[type="email"]:focus {
-            border-color: #4a5568;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
         }
         button {
-            background: #1a1a2e;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
         button:hover {
             background: #2d3748;
         }
+        button:active {
+            transform: scale(0.98);
+        }
         button:disabled {
-            background: #a0aec0;
+            background: #cbd5e0;
             cursor: not-allowed;
         }
         .message {
             margin-top: 16px;
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 8px;
             font-size: 14px;
             display: none;
         }
         .message.success {
-            background: #16a34a;
-            color: white;
+            background: #f0fff4;
+            color: var(--success);
+            border: 1px solid #9ae6b4;
             display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .message.error {
-            background: #dc2626;
-            color: white;
+            background: #fff5f5;
+            color: var(--error);
+            border: 1px solid #feb2b2;
             display: block;
-            animation: shake 0.3s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
         }
         .privacy-note {
-            margin-top: 16px;
+            margin-top: 20px;
             font-size: 12px;
-            color: #718096;
+            color: var(--text);
             text-align: center;
         }
         .privacy-note a {
-            color: #4a5568;
-            text-decoration: underline;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--text-dark);
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 520px) {
             .container {
-                padding: 24px 20px;
-            }
-            h1 {
-                font-size: 24px;
+                padding: 32px 24px;
             }
             .form-group {
                 flex-direction: column;
@@ -180,15 +198,12 @@ if (empty($_SESSION['csrf_token'])) {
             .form-group button {
                 width: 100%;
             }
-            .form-group button {
-                margin-top: 4px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hi, I'm Gabriele 👋</h1>
+        <h1>Hi, I'm Gabriele</h1>
         <p class="title">Fullstack Developer</p>
         
         <p class="bio">
@@ -206,36 +221,38 @@ if (empty($_SESSION['csrf_token'])) {
             I know this is a bit uncoventional, but I've grown tired of receving so many "Unfortunately we have to inform you that..." emails, so here we are.
         </p>
         
-        <p class="section-title">Skills</p>
-        
-        <div class="skills-category">
-            <p class="category-title">Frontend</p>
-            <div class="skills">
-                <span class="skill-tag">JavaScript</span>
-                <span class="skill-tag">TypeScript</span>
-                <span class="skill-tag">Angular</span>
-                <span class="skill-tag">Vue 3 (Self taught)</span>
-                <span class="skill-tag">JQuery + AJAX</span>
+        <div class="skills-section">
+            <p class="skills-title">Skills</p>
+            
+            <div class="skills-category">
+                <p class="category-title">Frontend</p>
+                <div class="skills">
+                    <span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">TypeScript</span>
+                    <span class="skill-tag">Angular</span>
+                    <span class="skill-tag">Vue 3 (Self taught)</span>
+                    <span class="skill-tag">JQuery + AJAX</span>
+                </div>
             </div>
-        </div>
-        
-        <div class="skills-category">
-            <p class="category-title">Backend</p>
-            <div class="skills">
-                <span class="skill-tag">C#</span>
-                <span class="skill-tag">Node.js</span>
-                <span class="skill-tag">Nest.js (Currently learning)</span>
-                <span class="skill-tag">SQL</span>
-                <span class="skill-tag">MicroPython</span>
+            
+            <div class="skills-category">
+                <p class="category-title">Backend</p>
+                <div class="skills">
+                    <span class="skill-tag">C#</span>
+                    <span class="skill-tag">Node.js</span>
+                    <span class="skill-tag">Nest.js (Currently learning)</span>
+                    <span class="skill-tag">SQL</span>
+                    <span class="skill-tag">MicroPython</span>
+                </div>
             </div>
-        </div>
-        
-        <div class="skills-category">
-            <p class="category-title">Tools & Cloud</p>
-            <div class="skills">
-                <span class="skill-tag">Playwright</span>
-                <span class="skill-tag">Azure</span>
-                <span class="skill-tag">Git</span>
+            
+            <div class="skills-category">
+                <p class="category-title">Tools & Cloud</p>
+                <div class="skills">
+                    <span class="skill-tag">Playwright</span>
+                    <span class="skill-tag">Azure</span>
+                    <span class="skill-tag">Git</span>
+                </div>
             </div>
         </div>
         
@@ -251,7 +268,7 @@ if (empty($_SESSION['csrf_token'])) {
                 <div id="message" class="message"></div>
             </form>
             <p class="privacy-note">
-                🔒 <a href="https://github.com/snarpeppo/QRCV" target="_blank">Open source</a> - no data collected
+                <a href="https://github.com/snarpeppo/QRCV" target="_blank">Open source</a> — no data collected
             </p>
         </div>
     </div>
