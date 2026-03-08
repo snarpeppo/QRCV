@@ -9,6 +9,7 @@ $yourName = $config['name'];
 $cvFile = $config['cv_path'];
 
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+$timestamp = date('Y-m-d H:i:s');
 
 if (empty($email)) {
     echo json_encode(['success' => false, 'message' => 'Email is required']);
@@ -54,16 +55,16 @@ if (file_exists($cvFile)) {
     $requesterSent = false;
 }
 
-echo json_encode([
-    'success' => true,
-    'message' => 'Email sent successfully',
-    'debug' => [
-        'file_written' => $fileWritten ?? false,
-        'mail_sent' => $mailSent,
-        'requester_sent' => $requesterSent,
-        'cv_file_exists' => file_exists($cvFile),
-        'cv_file_path' => $cvFile,
-        'requester_error' => $requesterSent ? null : error_get_last(),
-        'server' => $_SERVER['HTTP_HOST']
-    ]
-]);
+// echo json_encode([
+//     'success' => true,
+//     'message' => 'Email sent successfully',
+//     'debug' => [
+//         'file_written' => $fileWritten ?? false,
+//         'mail_sent' => $mailSent,
+//         'requester_sent' => $requesterSent,
+//         'cv_file_exists' => file_exists($cvFile),
+//         'cv_file_path' => $cvFile,
+//         'requester_error' => $requesterSent ? null : error_get_last(),
+//         'server' => $_SERVER['HTTP_HOST']
+//     ]
+// ]);
