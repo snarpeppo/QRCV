@@ -4,9 +4,68 @@ header('Content-Type: application/json');
 
 require_once 'config.php';
 
-$yourEmail = $config['email'];
-$yourName = $config['name'];
-$cvFile = $config['cv_path'];
+session_start();
+
+function getClientIp() {
+    $ipKeys = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'];
+    foreach ($ipKeys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $ip = explode(',', $_SERVER[$key])[0];
+            return trim($ip);
+        }
+    }
+    return 'unknown';
+}
+
+function checkRateLimit($ip, $maxRequests = 5, $windowSeconds = 60) {
+    $rateFile = sys_get_temp_dir() . '/qrcv_ratelimit_' . md5($ip);
+    $now = time();
+    
+    if (file_exists($rateFile)) {
+        $data = json_decode(file_get_contents($rateFile), true);
+        if ($data && $data['expires'] > $now) {
+            if ($data['count'] >= $maxRequests) {
+                return false;
+            }
+            $data['count']++;
+        } else {
+            $data = ['count' => 1, 'expires' => $now + $windowSeconds];
+        }
+    } else {
+        $data = ['count' => 1, 'expires' => $now + $windowSeconds];
+    }
+    
+    file_put_contents($rateFile, json_encode($data));
+    return true;
+}
+
+function sanitizeString($str, $maxLength = 100) {
+    $str = trim($str);
+    $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+    return substr($str, 0, $maxLength);
+}
+
+$clientIp = getClientIp();
+
+if (!checkRateLimit($clientIp)) {
+    echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
+    exit;
+}
+
+$csrfToken = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+$sessionToken = $_SESSION['csrf_token'] ?? '';
+if (empty($csrfToken) || empty($sessionToken) || !hash_equals($sessionToken, $csrfToken)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid request', 'debug' => [
+        'csrf_received' => !empty($csrfToken),
+        'csrf_session' => !empty($sessionToken),
+        'match' => !empty($csrfToken) && !empty($sessionToken) && hash_equals($sessionToken, $csrfToken)
+    ]]);
+    exit;
+}
+
+$yourEmail = filter_var($config['email'], FILTER_SANITIZE_EMAIL);
+$yourName = sanitizeString($config['name']);
+$cvFile = filter_var($config['cv_path'], FILTER_SANITIZE_URL);
 
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $timestamp = date('Y-m-d H:i:s');

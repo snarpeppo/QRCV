@@ -1,3 +1,9 @@
+<?php
+session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,6 +165,25 @@
             color: #4a5568;
             text-decoration: underline;
         }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .form-group {
+                flex-direction: column;
+            }
+            .form-group input,
+            .form-group button {
+                width: 100%;
+            }
+            .form-group button {
+                margin-top: 4px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -167,8 +192,18 @@
         <p class="title">Fullstack Developer</p>
         
         <p class="bio">
-            I'm a fullstack developer looking to relocate to Berlin. 
-            Passionate about building great products and always eager to learn new technologies.
+            I know this is pretty random, but hear me out.
+            I wanted to create a simple and interactive way for recruiters/(anyone honestly) to request my CV without sharing it publicly.
+        </p>
+
+        <p class="bio">
+            Just like the sticker says, I'm a DEVeloper looking for new opportunities here in Berlin, having experience in a broad range of technologies
+            suits me for different projects, you can check them below... Or you could take a look at my CV by leaving your preferred email in the form below, and it will be sent to you right away!
+        </p>
+
+
+        <p class="bio">
+            I know this is a bit uncoventional, but I've grown tired of receving so many "Unfortunately we have to inform you that..." emails, so here we are.
         </p>
         
         <p class="section-title">Skills</p>
@@ -208,6 +243,7 @@
             <p class="form-title">Get My CV</p>
             <p class="form-desc">Leave your email and I'll send you my full CV.</p>
             <form id="cvForm">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <div class="form-group">
                     <input type="email" id="email" name="email" placeholder="your@email.com" required>
                     <button type="submit">Send</button>
@@ -223,7 +259,9 @@
     <script>
         document.getElementById('cvForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const csrfToken = formData.get('csrf_token');
             const messageEl = document.getElementById('message');
             const btn = this.querySelector('button');
             
@@ -234,7 +272,7 @@
                 const response = await fetch('submit.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'email=' + encodeURIComponent(email)
+                    body: 'email=' + encodeURIComponent(email) + '&csrf_token=' + encodeURIComponent(csrfToken)
                 });
                 
                 const result = await response.json();
